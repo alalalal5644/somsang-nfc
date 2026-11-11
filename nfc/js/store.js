@@ -7,7 +7,7 @@
 (function () {
   const CFG = window.SOMSANG_CONFIG || {};
   const SAMPLES = window.SOMSANG_SAMPLES || { plushes: [], messages: [] };
-  const DEMO_KEY = 'somsang_nfc_demo_v1';
+  const DEMO_KEY = 'somsang_nfc_demo_v4';
   const DEMO_SESSION = 'somsang_nfc_demo_session';
   const ID_RE = /^SOM-\d{3,}$/;
 
@@ -42,6 +42,7 @@
       memory_images: p.memory_images || [],
       original_image: p.original_image || '',
       reborn_image: p.reborn_image || '',
+      reborn_image_back: p.reborn_image_back || '',
       reborn_steps: p.reborn_steps || []
     });
   }
@@ -153,7 +154,7 @@
     async updatePlush(id, patch) {
       const db = Demo.load();
       const p = Demo.ownedOrThrow(db, id);
-      const allowed = ['plush_name', 'plush_image', 'greeting', 'first_met_date', 'reborn_date', 'memory_text', 'memory_moments', 'memory_images', 'original_image', 'reborn_image', 'reborn_steps'];
+      const allowed = ['plush_name', 'plush_image', 'greeting', 'first_met_date', 'reborn_date', 'memory_text', 'memory_moments', 'memory_images', 'original_image', 'reborn_image', 'reborn_image_back', 'reborn_steps'];
       allowed.forEach((k) => { if (k in patch) p[k] = patch[k]; });
       Demo.save(db);
       return clone(p);
@@ -236,7 +237,7 @@
     });
   }
 
-  const PLUSH_COLUMNS = 'plush_id,plush_name,plush_image,greeting,owner_id,mode,lost_status,lost_since,first_met_date,reborn_date,memory_text,memory_moments,memory_images,original_image,reborn_image,reborn_steps,updated_at';
+  const PLUSH_COLUMNS = 'plush_id,plush_name,plush_image,greeting,owner_id,mode,lost_status,lost_since,first_met_date,reborn_date,memory_text,memory_moments,memory_images,original_image,reborn_image,reborn_image_back,reborn_steps,updated_at';
 
   const sbApi = {
     async getPublicPlush(id) {

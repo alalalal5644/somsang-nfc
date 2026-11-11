@@ -418,7 +418,7 @@ textarea.input{resize:vertical;min-height:120px;line-height:1.6;}
 .ba-edit label.slot{display:block;cursor:pointer;}
 .ba-edit .slot-img{border-radius:16px;overflow:hidden;aspect-ratio:1/1;background:var(--cloud);position:relative;}
 .ba-edit .slot-img img{width:100%;height:100%;object-fit:cover;}
-.ba-edit .slot-img::after{content:"\f030";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:8px;bottom:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+.ba-edit .slot-img::after{content:"\f030";font-family:"Font Awesome 6 Free","Font Awesome 7 Free";font-weight:900;position:absolute;right:8px;bottom:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--brand);display:flex;align-items:center;justify-content:center;font-size:.8rem;}
 .ba-edit .slot span{display:block;margin-top:6px;text-align:center;font-size:.8rem;font-weight:700;color:var(--ink-soft);}
 .ba-edit input{display:none;}
 .save-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 20px calc(12px + env(safe-area-inset-bottom));transform:translateY(110%);visibility:hidden;transition:transform .2s ease,visibility 0s linear .2s;}
@@ -519,3 +519,25 @@ body.has-owner-bar{padding-bottom:96px;}
 .switch[aria-checked="true"] .track::after{transform:translateX(20px);}
 .switch:disabled{opacity:.6;cursor:wait;}
 body.has-owner-bar .toast{bottom:calc(96px + env(safe-area-inset-bottom));}
+
+/* AFTER 키링 앞/뒤 보기 */
+.ba-flip{position:relative;cursor:pointer;}
+.ba-flip img{position:absolute;inset:0;transition:opacity .35s ease;}
+.ba-flip .side-back{opacity:0;}
+.ba-flip.show-back .side-back{opacity:1;}
+.ba-flip.show-back .side-front{opacity:0;}
+.flip-tabs{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;padding:3px;border-radius:999px;background:rgba(18,58,82,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.flip-tabs button{border:none;background:none;color:#fff;font-size:.74rem;font-weight:700;padding:5px 12px;border-radius:999px;}
+.flip-tabs button[aria-pressed="true"]{background:#fff;color:var(--brand-deep);}
+.ba-edit{grid-template-columns:repeat(3,1fr);}
+
+/* LOST MODE — 빨간 포인트 */
+.lost-top{background:radial-gradient(120% 75% at 50% 0%,rgba(214,69,69,.42) 0%,rgba(214,69,69,.12) 45%,rgba(214,69,69,0) 70%),var(--brand-deep);border-top:4px solid var(--warn);}
+.lost-flag{background:rgba(214,69,69,.25);border:1px solid rgba(255,138,138,.45);color:#FFE1E1;}
+.lost-card{border-top:5px solid var(--warn);}
+.lost-card img.photo{border-color:var(--warn-soft);box-shadow:0 0 0 3px rgba(214,69,69,.18);}
+.lost-meta{border-color:#F3D3D3;}
+.lost-meta div+div{border-left-color:#F3D3D3;background:var(--warn-soft);}
+.lost-card .privacy i{color:var(--warn);}
+.finder-guide .guide-item:first-child{background:var(--warn-soft);}
+.finder-guide .guide-item:first-child .ic{color:var(--warn);}

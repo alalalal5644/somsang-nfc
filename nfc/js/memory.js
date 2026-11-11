@@ -142,7 +142,13 @@
           '<div class="ba">' +
             '<figure><div class="ba-img">' + (p.original_image ? img(p.original_image, '환생 전 ' + name) : '<div class="state" style="min-height:0;height:100%;padding:0"><i class="fa-regular fa-image" style="font-size:1.6rem;color:#8B93BE"></i></div>') + '</div><figcaption><b>BEFORE</b><span>환생 전 원본 인형</span></figcaption></figure>' +
             '<div class="ba-arrow" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>' +
-            '<figure><div class="ba-img">' + img(p.reborn_image || p.plush_image, '환생 후 ' + name + ' 키링') + '</div><figcaption><b>AFTER</b><span>환생 키링</span></figcaption></figure>' +
+            '<figure><div class="ba-img' + (p.reborn_image_back ? ' ba-flip' : '') + '" id="afterImg">' +
+              img(p.reborn_image || p.plush_image, '환생 후 ' + name + ' 키링 앞모습', 'side-front') +
+              (p.reborn_image_back
+                ? img(p.reborn_image_back, '환생 후 ' + name + ' 키링 뒷모습', 'side-back') +
+                  '<div class="flip-tabs" role="group" aria-label="키링 앞뒤 보기"><button type="button" data-side="front" aria-pressed="true">앞</button><button type="button" data-side="back" aria-pressed="false">뒤</button></div>'
+                : '') +
+            '</div><figcaption><b>AFTER</b><span>환생 키링</span></figcaption></figure>' +
           '</div>' +
           (steps.length
             ? '<ol class="rsteps">' + steps.map((s, i) =>
@@ -162,6 +168,15 @@
       '</section>';
 
     bindGallery(images);
+    const flip = document.getElementById('afterImg');
+    if (flip && flip.classList.contains('ba-flip')) {
+      flip.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-side]');
+        const side = b ? b.dataset.side : (flip.classList.contains('show-back') ? 'front' : 'back');
+        flip.classList.toggle('show-back', side === 'back');
+        flip.querySelectorAll('[data-side]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.side === side)));
+      });
+    }
     document.getElementById('shareBtn').addEventListener('click', async () => {
       const data = { title: name + ' · 솜생 MEMORY ARCHIVE', text: '안녕, 나는 ' + name + josa(name, '이야', '야') + '! 나와 함께한 기억을 만나보세요.', url: location.href };
       if (navigator.share) { try { await navigator.share(data); } catch (e) {} }
@@ -535,7 +550,7 @@
   }
 
   // 관리 페이지(다른 탭)에서 모드를 바꾸면 데모 모드에서 즉시 반영
-  window.addEventListener('storage', (e) => { if (S.isDemo && e.key === 'somsang_nfc_demo_v1') location.reload(); });
+  window.addEventListener('storage', (e) => { if (S.isDemo && e.key === 'somsang_nfc_demo_v4') location.reload(); });
   // 탭으로 돌아올 때 모드 재확인 (실서비스에서도 최신 상태 유지)
   document.addEventListener('visibilitychange', async () => {
     if (document.visibilityState !== 'visible' || !state.plush || state.isSample) return;

@@ -33,7 +33,8 @@ create table if not exists public.plushes (
   memory_images    jsonb not null default '[]'::jsonb,   -- [{url, caption}]
   memory_moments   jsonb not null default '[]'::jsonb,   -- [{date, title, text}]
   original_image   text,
-  reborn_image     text,
+  reborn_image     text,                                 -- 환생 키링 (앞)
+  reborn_image_back text,                                -- 환생 키링 (뒤)
   reborn_steps     jsonb not null default '[]'::jsonb,   -- [{date, title, text}]
   claim_code_hash  text,                                 -- 키링 등록 코드 (bcrypt)
   created_at       timestamptz not null default now(),
@@ -41,6 +42,8 @@ create table if not exists public.plushes (
 );
 
 create index if not exists plushes_owner_idx on public.plushes(owner_id);
+-- 이전 버전 스키마를 이미 실행했다면 컬럼만 추가
+alter table public.plushes add column if not exists reborn_image_back text;
 
 -- mode ↔ lost_status 자동 동기화 + updated_at 갱신
 create or replace function public.plushes_sync()
@@ -87,11 +90,11 @@ revoke all on public.finder_messages from anon, authenticated;
 -- 주인: 등록 코드(claim_code_hash)를 제외한 컬럼만 조회
 grant select (plush_id, plush_name, plush_image, greeting, owner_id, mode, lost_status, lost_since,
               first_met_date, reborn_date, memory_text, memory_images, memory_moments,
-              original_image, reborn_image, reborn_steps, created_at, updated_at)
+              original_image, reborn_image, reborn_image_back, reborn_steps, created_at, updated_at)
   on public.plushes to authenticated;
 -- 주인: 내용·모드만 수정 가능 (owner_id / plush_id / 등록 코드는 수정 불가)
 grant update (plush_name, plush_image, greeting, mode, first_met_date, reborn_date,
-              memory_text, memory_images, memory_moments, original_image, reborn_image, reborn_steps)
+              memory_text, memory_images, memory_moments, original_image, reborn_image, reborn_image_back, reborn_steps)
   on public.plushes to authenticated;
 
 drop policy if exists "owner can read own plush" on public.plushes;
@@ -159,6 +162,7 @@ begin
     'memory_moments', r.memory_moments,
     'original_image', r.original_image,
     'reborn_image', r.reborn_image,
+    'reborn_image_back', r.reborn_image_back,
     'reborn_steps', r.reborn_steps
   );
 end $$;
@@ -254,32 +258,32 @@ create policy "owner deletes plush images" on storage.objects
 --    실제 판매용 키링은 아래 "7. 운영 메모"의 방식으로 추가하세요.
 -- ---------------------------------------------------------
 insert into public.plushes (plush_id, plush_name, plush_image, greeting, mode, first_met_date, reborn_date,
-  memory_text, memory_moments, memory_images, original_image, reborn_image, reborn_steps, claim_code_hash)
+  memory_text, memory_moments, memory_images, original_image, reborn_image, reborn_image_back, reborn_steps, claim_code_hash)
 values
-('SOM-001', '몽이', 'nfc/img/mong.svg', '나와 함께한 소중한 기억을 만나보세요.', 'memory', '2015-12-24', '2026-10-18',
- E'크리스마스 이브, 아빠가 퇴근길에 사 온 작은 강아지 인형이 몽이였어요.\n\n이사를 세 번 하고, 기숙사 생활을 하고, 처음 혼자 살게 된 방에서도 몽이는 늘 베개 옆에 있었어요. 털이 닳고 귀 한쪽에 바느질 자국이 생겼지만, 그만큼 같이 지낸 시간이 많았다는 뜻이겠죠.\n\n이제는 가방에 달고 어디든 함께 다닐 수 있게 되었어요. 앞으로도 잘 부탁해, 몽이야.',
- '[{"date":"2015-12-24","title":"처음 만난 날","text":"크리스마스 선물 상자 속에서 처음 만났어요."},
-   {"date":"2018-08-03","title":"첫 가족 여행","text":"제주도 바다를 같이 봤어요. 캐리어 맨 위 자리는 늘 몽이 차지."},
-   {"date":"2021-03-02","title":"기숙사 입사","text":"낯선 방에서 잠 못 들던 밤마다 꼭 안고 잤어요."},
-   {"date":"2024-06-15","title":"첫 자취","text":"이삿짐 상자 중 가장 먼저 연 상자에 몽이가 있었어요."}]',
- '[{"url":"nfc/img/memory-1.svg","caption":"처음 만난 크리스마스"},
-   {"url":"nfc/img/memory-2.svg","caption":"제주 바다 앞에서"},
-   {"url":"nfc/img/memory-3.svg","caption":"매일 밤 베개 옆"},
-   {"url":"nfc/img/memory-4.svg","caption":"첫 자취방 이사 날"}]',
- 'nfc/img/mong-original.svg', 'nfc/img/mong-keyring.svg',
- '[{"date":"2026-09-28","title":"환생 접수","text":"몽이를 솜생에 보내고 환생을 신청했어요."},
+('SOM-001', '토순이', 'nfc/img/tosun-after-front.jpg', '나와 함께한 소중한 기억을 만나보세요.', 'memory', '2021-11-11', '2026-10-18',
+ E'빼빼로데이, 아빠가 퇴근길에 빼빼로와 함께 사 온 작은 토끼 인형이 토순이였어요.\n\n이사를 세 번 하고, 기숙사 생활을 하고, 처음 혼자 살게 된 방에서도 토순이는 늘 베개 옆에 있었어요. 털이 닳고 귀 한쪽에 바느질 자국이 생겼지만, 그만큼 같이 지낸 시간이 많았다는 뜻이겠죠.\n\n이제는 가방에 달고 어디든 함께 다닐 수 있게 되었어요. 앞으로도 잘 부탁해, 토순아.',
+ '[{"date":"2021-11-11","title":"처음 만난 날","text":"빼빼로 상자 옆 작은 선물 상자 속에서 처음 만났어요."},
+   {"date":"2022-08-03","title":"첫 가족 여행","text":"제주도 바다를 같이 봤어요. 캐리어 맨 위 자리는 늘 토순이 차지."},
+   {"date":"2023-03-02","title":"기숙사 입사","text":"낯선 방에서 잠 못 들던 밤마다 꼭 안고 잤어요."},
+   {"date":"2024-06-15","title":"첫 자취","text":"이삿짐 상자 중 가장 먼저 연 상자에 토순이가 있었어요."}]',
+ '[{"url":"nfc/img/tosun-memory-1.jpg","caption":"처음 만난 날"},
+   {"url":"nfc/img/tosun-memory-2.jpg","caption":"제주 바다 앞에서"},
+   {"url":"nfc/img/tosun-memory-3.jpg","caption":"매일 밤 베개 옆"},
+   {"url":"nfc/img/tosun-memory-4.jpg","caption":"첫 자취방 이사 날"}]',
+ 'nfc/img/tosun-original.jpg', 'nfc/img/tosun-after-front.jpg', 'nfc/img/tosun-after-back.jpg',
+ '[{"date":"2026-09-28","title":"환생 접수","text":"토순이를 솜생에 보내고 환생을 신청했어요."},
    {"date":"2026-10-02","title":"세척 · 상태 확인","text":"저온 세척 후 원단과 솜 상태를 꼼꼼히 확인했어요."},
    {"date":"2026-10-09","title":"키링 제작","text":"얼굴과 귀 원단을 살려 손바닥만 한 키링으로 다시 만들었어요."},
-   {"date":"2026-10-18","title":"NFC 기억 등록","text":"몽이의 기억을 NFC 칩에 연결하고 환생을 마쳤어요."}]',
+   {"date":"2026-10-18","title":"NFC 기억 등록","text":"토순이의 기억을 NFC 칩에 연결하고 환생을 마쳤어요."}]',
  extensions.crypt('MONG-2015', extensions.gen_salt('bf'))),
 ('SOM-002', '보리', 'nfc/img/bori.svg', '하늘색 귀가 매력인 보리예요.', 'lost', '2019-05-05', '2026-08-30',
  '어린이날 선물로 받은 보리. (분실모드에서는 이 내용이 공개되지 않아요)',
  '[{"date":"2019-05-05","title":"처음 만난 날","text":"어린이날 선물로 받았어요."}]', '[]',
- 'nfc/img/mong-original.svg', 'nfc/img/bori.svg',
+ 'nfc/img/mong-original.svg', 'nfc/img/bori.svg', null,
  '[{"date":"2026-08-30","title":"환생 완료","text":"키링으로 다시 태어났어요."}]',
  extensions.crypt('BORI-2019', extensions.gen_salt('bf'))),
 ('SOM-003', '두부', 'nfc/img/dubu.svg', '말랑말랑 두부의 기억 보관함이에요.', 'memory', '2022-11-11', '2026-11-01',
- '', '[]', '[]', '', 'nfc/img/dubu.svg', '[]',
+ '', '[]', '[]', '', 'nfc/img/dubu.svg', null, '[]',
  extensions.crypt('DUBU-2022', extensions.gen_salt('bf')))
 on conflict (plush_id) do nothing;
 

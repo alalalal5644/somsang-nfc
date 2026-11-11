@@ -31,7 +31,7 @@ somsang-website/
 
 | 주소 | 화면 |
 |---|---|
-| `memory.html?id=SOM-001` | 몽이 · MEMORY MODE |
+| `memory.html?id=SOM-001` | 토순이 · MEMORY MODE |
 | `memory.html?id=SOM-002` | 보리 · LOST MODE (분실 안내 + 메시지 보내기) |
 | `memory.html?id=SOM-003` | 두부 · 기억이 아직 적은 상태 |
 | `my-somsang.html` | 관리 페이지 — 데모 계정 `demo@somsang.com` / `somsang1234` |

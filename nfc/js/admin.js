@@ -367,7 +367,8 @@
         '<h3><i class="fa-regular fa-star"></i>RE-BIRTH RECORD</h3>' +
         '<div class="ba-edit" style="margin-top:16px">' +
           '<label class="slot"><div class="slot-img">' + (d.original_image ? img(d.original_image, '') : '') + '</div><span>환생 전 원본 인형</span><input type="file" accept="image/*" data-upload="original_image"></label>' +
-          '<label class="slot"><div class="slot-img">' + (d.reborn_image ? img(d.reborn_image, '') : '') + '</div><span>환생 후 키링</span><input type="file" accept="image/*" data-upload="reborn_image"></label>' +
+          '<label class="slot"><div class="slot-img">' + (d.reborn_image ? img(d.reborn_image, '') : '') + '</div><span>환생 키링 (앞)</span><input type="file" accept="image/*" data-upload="reborn_image"></label>' +
+          '<label class="slot"><div class="slot-img">' + (d.reborn_image_back ? img(d.reborn_image_back, '') : '') + '</div><span>환생 키링 (뒤)</span><input type="file" accept="image/*" data-upload="reborn_image_back"></label>' +
         '</div>' +
         '<label style="display:block;font-weight:600;font-size:.94rem;margin:22px 0 10px">환생 과정 기록</label>' +
         '<div class="row-editor" id="stepsEd"></div>' +
@@ -505,6 +506,7 @@
       memory_images: (d.memory_images || []).map((g) => ({ url: g.url, caption: String(g.caption || '').trim() })),
       original_image: d.original_image || '',
       reborn_image: d.reborn_image || '',
+      reborn_image_back: d.reborn_image_back || '',
       reborn_steps: cleanRows(d.reborn_steps)
     };
     const btn = document.getElementById('saveBtn');
